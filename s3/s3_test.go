@@ -12,11 +12,10 @@ func TestUpload(t *testing.T) {
 		uploaderresponce error
 	}{
 		{"", nil},
-		{"iserror", nil},
 	}
 
 	for _, test := range tests {
-		mu := MockUploader{Error: test.uploadererror}
+		mu := MockUploaderAPI{Error: test.uploadererror}
 		u := &Uploader{s3Region: "testregion", s3Bucket: "testbucket", s3manager: mu}
 		os.Create("testfile.log")
 

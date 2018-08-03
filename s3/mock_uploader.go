@@ -2,24 +2,27 @@ package s3
 
 import (
 	"errors"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
-type MockUploader struct {
+type MockUploaderAPI struct {
 	Error string
 }
 
-type UploadOutput struct {
-	Location string
-}
-
-type UploadInput struct {
-	Location string
-}
-
-func (u *MockUploader) Upload(input *UploadInput, options ...func(*MockUploader)) (*UploadOutput, error) {
+func (u MockUploaderAPI) Upload(*s3manager.UploadInput, ...func(*s3manager.Uploader)) (*s3manager.UploadOutput, error) {
 	if u.Error != "" {
 		return nil, errors.New(u.Error)
 	}
 
-	return &UploadOutput{"fakelocation"}, nil
+	return &s3manager.UploadOutput{}, nil
+}
+
+func (u MockUploaderAPI) UploadWithContext(aws.Context, *s3manager.UploadInput, ...func(*s3manager.Uploader)) (*s3manager.UploadOutput, error) {
+	if u.Error != "" {
+		return nil, errors.New(u.Error)
+	}
+
+	return &s3manager.UploadOutput{}, nil
 }
