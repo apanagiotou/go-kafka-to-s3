@@ -1,0 +1,15 @@
+version: '3.6'
+services:
+  kafka-s3-connector:
+    container_name: kafka-s3-connector
+    hostname: kafka-s3-connector
+    image: registry-dev.taxibeat.com/beat/kafka-s3-connector
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    environment: 
+      BOOTSTRAP_SERVERS: "10.4.2.180:9092"
+      KAFKA_TOPIC: "driver_position"
+      KAFKA_CONSUMER_GROUP: "kafka-s3-connector"
+      S3_REGION: "eu-west-1"
+      S3_BUCKET: "beat-test-driver-position"

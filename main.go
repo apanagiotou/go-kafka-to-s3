@@ -1,0 +1,97 @@
+package main
+
+import (
+	"fmt"
+	"log"
+	"os"
+	"time"
+
+	"github.com/apanagiotou/kafka-s3-connector/file"
+	"github.com/apanagiotou/kafka-s3-connector/kafka"
+	"github.com/apanagiotou/kafka-s3-connector/s3"
+)
+
+func main() {
+
+	// Configuration values are set in env variables
+	bootstrapServers := getEnv("BOOTSTRAP_SERVERS", "")
+	kafkaTopic := getEnv("KAFKA_TOPIC", "")
+	kafkaConsumerGroup := getEnv("KAFKA_CONSUMER_GROUP", "")
+	s3Region := getEnv("S3_REGION", "")
+	s3Bucket := getEnv("S3_BUCKET", "")
+
+	fileRotateSize := int64(10000000) // 10mb
+
+	// Initialize objects
+	kafkaConsumer := kafka.New(bootstrapServers, kafkaTopic, kafkaConsumerGroup, kafkaTopic)
+	positionFile, _ := file.New("driver_position.log", fileRotateSize)
+	s3Uploader := s3.New(s3Region, s3Bucket)
+
+	// This channel is used to store kafka messages
+	position := make(chan string, 1000)
+
+	// Write position to file
+	go func() {
+		for pos := range position {
+			_, err := positionFile.Write(pos)
+			if err != nil {
+				log.Println(err)
+			}
+		}
+	}()
+
+	// Rotate and upload the file to S3 if it has reached fileRotateSize
+	go func() {
+		for {
+			time.Sleep(5)
+			if rotate, err := positionFile.Rotateable(); rotate == true {
+				if err != nil {
+					log.Println(err)
+				}
+				rotatedFile, err := positionFile.Rotate()
+				if err != nil {
+					log.Println(err)
+				}
+				go func() {
+					compressed := file.Compress(rotatedFile)
+					err = s3Uploader.Upload(compressed)
+					if err != nil {
+						log.Println(err)
+					}
+					err = os.Remove(compressed)
+					if err != nil {
+						log.Println(err)
+					}
+				}()
+			}
+		}
+	}()
+
+	for {
+		// ReadMessage automatically commits offsets when using consumer groups.
+		msg, err := kafkaConsumer.Consume()
+
+		if err == nil {
+			position <- string(msg.Value)
+		} else {
+			fmt.Printf("Consumer error: %v (%v)\n", err, msg)
+			break
+		}
+	}
+
+	kafkaConsumer.Close()
+}
+
+// Takes an env and a fallback value. If the env exists it returns it.
+// If not and there is a fallback it returns that,
+// Else, stops the program
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	if fallback != "" {
+		return fallback
+	}
+	log.Fatal(key + " is not set")
+	return ""
+}
