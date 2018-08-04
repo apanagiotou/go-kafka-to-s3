@@ -9,6 +9,9 @@ import (
 	"github.com/apanagiotou/kafka-s3-connector/file"
 	"github.com/apanagiotou/kafka-s3-connector/kafka"
 	"github.com/apanagiotou/kafka-s3-connector/s3"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
 func main() {
@@ -22,15 +25,22 @@ func main() {
 
 	fileRotateSize := int64(10000000) // 10mb
 
-	// Initialize objects
+	// Initialize kafka and file
 	kafkaConsumer := kafka.New(bootstrapServers, kafkaTopic, kafkaConsumerGroup, kafkaTopic)
 	positionFile, _ := file.New("driver_position.log", fileRotateSize)
-	s3Uploader := s3.New(s3Region, s3Bucket)
+
+	// Initialize S3 Uploader used to upload the rotated file to S3
+	sess, err := session.NewSession(&aws.Config{Region: aws.String(s3Region)})
+	if err != nil {
+		log.Fatal(err, "S3 connection")
+	}
+	s3Manager := s3manager.NewUploader(sess)
+	s3Uploader := s3.New(s3Bucket, s3Manager)
 
 	// This channel is used to store kafka messages
 	position := make(chan string, 1000)
 
-	// Write position to file
+	// Writes kafka messages to the file
 	go func() {
 		for pos := range position {
 			_, err := positionFile.Write(pos)
@@ -82,7 +92,7 @@ func main() {
 	kafkaConsumer.Close()
 }
 
-// Takes an env and a fallback value. If the env exists it returns it.
+// getEnv takes an env and a fallback value. If the env exists it returns it.
 // If not and there is a fallback it returns that,
 // Else, stops the program
 func getEnv(key, fallback string) string {

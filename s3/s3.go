@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager/s3manageriface"
 	"github.com/pkg/errors"
@@ -13,26 +12,14 @@ import (
 
 // Uploader uploads a file to AWS S3
 type Uploader struct {
-	s3Region  string
 	s3Bucket  string
 	s3manager s3manageriface.UploaderAPI
 }
 
 // New makes a new S3Uploader. Return nil if error occurs during setup.
-func New(s3Region, s3Bucket string) *Uploader {
-	u := &Uploader{s3Region: s3Region, s3Bucket: s3Bucket}
-	u.ManageConection()
+func New(s3Bucket string, s3manager *s3manager.Uploader) *Uploader {
+	u := &Uploader{s3Bucket: s3Bucket, s3manager: s3manager}
 	return u
-}
-
-// ManageConection manages a new session to S3
-func (u *Uploader) ManageConection() error {
-	sess, err := session.NewSession(&aws.Config{Region: aws.String(u.s3Region)})
-	if err != nil {
-		return errors.Wrap(err, "S3 connection")
-	}
-	u.s3manager = s3manager.NewUploader(sess)
-	return nil
 }
 
 // Upload will upload a single file to S3, it will require a pre-built aws session

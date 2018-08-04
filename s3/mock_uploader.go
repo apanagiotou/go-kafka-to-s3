@@ -7,11 +7,11 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
-type MockUploaderAPI struct {
+type mockUploaderAPI struct {
 	Error string
 }
 
-func (u MockUploaderAPI) Upload(*s3manager.UploadInput, ...func(*s3manager.Uploader)) (*s3manager.UploadOutput, error) {
+func (u mockUploaderAPI) Upload(*s3manager.UploadInput, ...func(*s3manager.Uploader)) (*s3manager.UploadOutput, error) {
 	if u.Error != "" {
 		return nil, errors.New(u.Error)
 	}
@@ -19,7 +19,7 @@ func (u MockUploaderAPI) Upload(*s3manager.UploadInput, ...func(*s3manager.Uploa
 	return &s3manager.UploadOutput{}, nil
 }
 
-func (u MockUploaderAPI) UploadWithContext(aws.Context, *s3manager.UploadInput, ...func(*s3manager.Uploader)) (*s3manager.UploadOutput, error) {
+func (u mockUploaderAPI) UploadWithContext(aws.Context, *s3manager.UploadInput, ...func(*s3manager.Uploader)) (*s3manager.UploadOutput, error) {
 	if u.Error != "" {
 		return nil, errors.New(u.Error)
 	}

@@ -15,8 +15,8 @@ func TestUpload(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		mu := MockUploaderAPI{Error: test.uploadererror}
-		u := &Uploader{s3Region: "testregion", s3Bucket: "testbucket", s3manager: mu}
+		mu := mockUploaderAPI{Error: test.uploadererror}
+		u := &Uploader{s3Bucket: "testbucket", s3manager: mu}
 		os.Create("testfile.log")
 
 		err := u.Upload("testfile.log")
