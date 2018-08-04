@@ -78,23 +78,32 @@ func (w *RotateWriter) Rotate() (string, error) {
 
 	// Create the file.
 	w.fp, err = os.Create(w.filename)
+	if err != nil {
+		return rotatedFilename, errors.Wrap(err, "OS File create")
+	}
 	return rotatedFilename, nil
 }
 
 // Compress compresses plain files
-func Compress(filename string) string {
+func Compress(filename string) (string, error) {
 
 	compressed := filename + ".gz"
 
 	// Open file on disk.
-	f, _ := os.Open(filename)
+	f, err := os.Open(filename)
+	if err == nil {
+		return "", errors.Wrap(err, "OS File open")
+	}
 
 	// Create a Reader and use ReadAll to get all the bytes from the file.
 	reader := bufio.NewReader(f)
 	content, _ := ioutil.ReadAll(reader)
 
 	// Open file for writing.
-	f, _ = os.Create(compressed)
+	f, err = os.Create(compressed)
+	if err == nil {
+		return "", errors.Wrap(err, "OS File create")
+	}
 
 	// Write compressed data.
 	fmt.Printf("Compressing %s\n", filename)
@@ -107,5 +116,5 @@ func Compress(filename string) string {
 
 	// Done.
 	fmt.Printf("File %s compressed\n", filename)
-	return compressed
+	return compressed, nil
 }

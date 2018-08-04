@@ -63,7 +63,10 @@ func main() {
 					log.Println(err)
 				}
 				go func() {
-					compressed := file.Compress(rotatedFile)
+					compressed, err := file.Compress(rotatedFile)
+					if err != nil {
+						log.Println(err)
+					}
 					err = s3Uploader.Upload(compressed)
 					if err != nil {
 						log.Println(err)
