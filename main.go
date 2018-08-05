@@ -20,7 +20,7 @@ func main() {
 	// Configuration values are set in env variables
 	bootstrapServers := getEnv("BOOTSTRAP_SERVERS", "")
 	kafkaTopic := getEnv("KAFKA_TOPIC", "")
-	kafkaConsumerGroup := getEnv("KAFKA_CONSUMER_GROUP", "")
+	kafkaConsumerGroup := getEnv("KAFKA_CONSUMER_GROUP", "go-kafka-to-s3")
 	s3Region := getEnv("S3_REGION", "")
 	s3Bucket := getEnv("S3_BUCKET", "")
 
