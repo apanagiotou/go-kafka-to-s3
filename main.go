@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/apanagiotou/go-kafka-to-s3/file"
@@ -23,11 +24,14 @@ func main() {
 	s3Region := getEnv("S3_REGION", "")
 	s3Bucket := getEnv("S3_BUCKET", "")
 
-	fileRotateSize := int64(10000000) // 10mb
+	// Get the size in Mebabytes from the env var and convert in int64 bytes
+	fileRotateSizeStr := getEnv("FILE_SIZE_THRESHOLD_MB", "10")
+	fileRotateSize, _ := strconv.Atoi(fileRotateSizeStr)
+	fileRotateSizeInBytes := int64(fileRotateSize * 1024 * 1024)
 
 	// Initialize kafka and file
 	kafkaConsumer := kafka.New(bootstrapServers, kafkaTopic, kafkaConsumerGroup, kafkaTopic)
-	positionFile, _ := file.New("driver_position.log", fileRotateSize)
+	positionFile, _ := file.New("driver_position.log", fileRotateSizeInBytes)
 
 	// Initialize S3 Uploader used to upload the rotated file to S3
 	sess, err := session.NewSession(&aws.Config{Region: aws.String(s3Region)})
