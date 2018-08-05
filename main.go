@@ -6,9 +6,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/apanagiotou/kafka-s3-connector/file"
-	"github.com/apanagiotou/kafka-s3-connector/kafka"
-	"github.com/apanagiotou/kafka-s3-connector/s3"
+	"github.com/apanagiotou/go-kafka-to-s3/file"
+	"github.com/apanagiotou/go-kafka-to-s3/kafka"
+	"github.com/apanagiotou/go-kafka-to-s3/s3"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"

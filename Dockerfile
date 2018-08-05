@@ -1,8 +1,8 @@
 FROM golang:1.10.3
-WORKDIR /go/src/github.com/docker-services/kafka-s3-connector/
+WORKDIR /go/src/github.com/docker-services/go-kafka-to-s3/
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o kafka-s3-connector .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o go-kafka-to-s3 .
 
 FROM scratch
-COPY --from=0 /go/src/github.com/docker-services/kafka-s3-connector .
-ENTRYPOINT ["./kafka-s3-connector"]
+COPY --from=0 /go/src/github.com/docker-services/go-kafka-to-s3 .
+ENTRYPOINT ["./go-kafka-to-s3"]
