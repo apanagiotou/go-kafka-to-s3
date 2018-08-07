@@ -23,6 +23,7 @@ var (
 	offset             = flag.String("offset", "latest", "The offset to start with. Can be `oldest`, `newest`")
 	bufferSize         = flag.Int("bufferSize", 1000, "The buffer size of the message channel.")
 	s3Bucket           = flag.String("s3Bucket", getEnv("S3_BUCKET", ""), "The S3 bucket to upload the files.")
+	s3BucketPath       = flag.String("s3BucketPath", getEnv("S3_BUCKET_SUBPATH", "/"), "The S3 bucket to upload the files.")
 	s3Region           = flag.String("s3Region", getEnv("S3_REGION", ""), "The S3 region of the bucket.")
 	fileRotateSizeStr  = flag.String("fileRotateSizeStr", getEnv("FILE_SIZE_THRESHOLD_MB", "10"), "The threshold to rotate the files and upload them.")
 )
@@ -36,7 +37,7 @@ func main() {
 
 	// Initialize kafka and file
 	kafkaConsumer := kafka.New(*kafkaBrokers, *kafkaTopic, *kafkaConsumerGroup, *offset)
-	positionFile, err := file.New("driver_position.log", fileRotateSizeInBytes)
+	positionFile, err := file.New(*kafkaTopic, fileRotateSizeInBytes)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -47,7 +48,7 @@ func main() {
 		log.Fatal(err)
 	}
 	s3Manager := s3manager.NewUploader(sess)
-	s3Uploader := s3.New(*s3Bucket, s3Manager)
+	s3Uploader := s3.New(*s3Bucket, *s3BucketPath, s3Manager)
 
 	// This channel is used to store kafka messages
 	position := make(chan string, *bufferSize)

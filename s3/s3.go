@@ -2,6 +2,7 @@ package s3
 
 import (
 	"os"
+	"path"
 
 	log "github.com/sirupsen/logrus"
 
@@ -13,13 +14,14 @@ import (
 
 // Uploader uploads a file to AWS S3
 type Uploader struct {
-	s3Bucket  string
-	s3manager s3manageriface.UploaderAPI
+	s3Bucket     string
+	s3BucketPath string
+	s3manager    s3manageriface.UploaderAPI
 }
 
 // New makes a new S3Uploader. Return nil if error occurs during setup.
-func New(s3Bucket string, s3manager *s3manager.Uploader) *Uploader {
-	u := &Uploader{s3Bucket: s3Bucket, s3manager: s3manager}
+func New(s3Bucket, s3BucketPath string, s3manager *s3manager.Uploader) *Uploader {
+	u := &Uploader{s3Bucket: s3Bucket, s3BucketPath: s3BucketPath, s3manager: s3manager}
 	return u
 }
 
@@ -36,7 +38,7 @@ func (u *Uploader) Upload(filename string) error {
 	log.Infof("Uploading %s to S3...\n", filename)
 	result, err := u.s3manager.Upload(&s3manager.UploadInput{
 		Bucket: aws.String(u.s3Bucket),
-		Key:    aws.String(filename),
+		Key:    aws.String(path.Join(u.s3BucketPath, filename)),
 		Body:   file,
 	})
 	if err != nil {
