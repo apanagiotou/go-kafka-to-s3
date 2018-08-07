@@ -10,6 +10,8 @@ import (
 	"syscall"
 	"time"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/pkg/errors"
 )
 
@@ -26,7 +28,7 @@ func New(filename string, maxsize int64) (w *RotateWriter, err error) {
 	w = &RotateWriter{filename: filename, maxsize: maxsize}
 	w.fp, err = os.OpenFile(filename, syscall.O_RDWR|syscall.O_CREAT, 0666)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 	return w, nil
 }
@@ -55,6 +57,8 @@ func (w *RotateWriter) Rotateable() (bool, error) {
 func (w *RotateWriter) Rotate() (string, error) {
 	w.lock.Lock()
 	defer w.lock.Unlock()
+
+	log.Debug("File rotation started")
 
 	rotatedFilename := ""
 
@@ -88,11 +92,12 @@ func (w *RotateWriter) Rotate() (string, error) {
 func Compress(filename string) (string, error) {
 
 	compressed := filename + ".gz"
+	log.Debugf("Compressing %s\n", filename)
 
 	// Open file on disk.
 	f, err := os.Open(filename)
-	if err == nil {
-		return "", errors.Wrap(err, "OS File open")
+	if err != nil {
+		return "", errors.Wrap(err, "File Compress")
 	}
 
 	// Create a Reader and use ReadAll to get all the bytes from the file.
@@ -101,12 +106,11 @@ func Compress(filename string) (string, error) {
 
 	// Open file for writing.
 	f, err = os.Create(compressed)
-	if err == nil {
-		return "", errors.Wrap(err, "OS File create")
+	if err != nil {
+		return "", errors.Wrap(err, "File Compress")
 	}
 
 	// Write compressed data.
-	fmt.Printf("Compressing %s\n", filename)
 	w := gzip.NewWriter(f)
 	w.Write(content)
 	w.Close()
@@ -115,6 +119,6 @@ func Compress(filename string) (string, error) {
 	os.Remove(filename)
 
 	// Done.
-	fmt.Printf("File %s compressed\n", filename)
+	log.Infof("File %s compressed\n", filename)
 	return compressed, nil
 }

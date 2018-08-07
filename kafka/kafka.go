@@ -1,7 +1,7 @@
 package kafka
 
 import (
-	"log"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
@@ -12,7 +12,7 @@ type Consumer struct {
 }
 
 // New creates a new Consumer.
-func New(bootstrapServers, consumerGroup, offsetResetType, topic string) (c *Consumer) {
+func New(bootstrapServers, topic, consumerGroup, offsetResetType string) (c *Consumer) {
 
 	kc, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers": bootstrapServers,

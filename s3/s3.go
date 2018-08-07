@@ -1,8 +1,9 @@
 package s3
 
 import (
-	"fmt"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
@@ -32,7 +33,7 @@ func (u *Uploader) Upload(filename string) error {
 	}
 	defer file.Close()
 
-	fmt.Printf("Uploading %s to S3...\n", filename)
+	log.Infof("Uploading %s to S3...\n", filename)
 	result, err := u.s3manager.Upload(&s3manager.UploadInput{
 		Bucket: aws.String(u.s3Bucket),
 		Key:    aws.String(filename),
@@ -41,6 +42,6 @@ func (u *Uploader) Upload(filename string) error {
 	if err != nil {
 		return errors.Wrap(err, "S3 upload")
 	}
-	fmt.Printf("Successfully uploaded %s to %s\n", filename, result.Location)
+	log.Infof("Successfully uploaded %s to %s\n", filename, result.Location)
 	return nil
 }

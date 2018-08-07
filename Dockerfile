@@ -1,8 +1,6 @@
-FROM golang:1.10.3
+FROM golang:1.10.3-alpine as builder
 WORKDIR /go/src/github.com/apanagiotou/go-kafka-to-s3/
+RUN apk add librdkafka-dev build-base
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o go-kafka-to-s3 .
-
-FROM scratch
-COPY --from=0 /go/src/github.com/apanagiotou/go-kafka-to-s3 .
+RUN GOOS=linux go build -a -o go-kafka-to-s3 .
 ENTRYPOINT ["./go-kafka-to-s3"]
