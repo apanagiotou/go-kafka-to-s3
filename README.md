@@ -1,6 +1,6 @@
 # go-kafka-to-s3
 
-go-kafka-to-s3 is a kafka consumer writen in Go. It reads messages from kafka, it saves them in a file and when the file reaches the pre-defined threshold size is uploaded to AWS S3.
+go-kafka-to-s3 is a kafka consumer writen in Go. Reads messages from a topic, gathers them in batches (files) of a pre-defined size and stores them in S3. It's useful if you want to have your data in a persistent storage for later process.
 
 ## Getting Started
 
