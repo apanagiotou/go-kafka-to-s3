@@ -35,7 +35,7 @@ func (u *Uploader) Upload(filename string) error {
 	}
 	defer file.Close()
 
-	log.Infof("Uploading %s to S3...\n", filename)
+	log.Infof("Uploading %s to S3...", filename)
 	result, err := u.s3manager.Upload(&s3manager.UploadInput{
 		Bucket: aws.String(u.s3Bucket),
 		Key:    aws.String(path.Join(u.s3BucketPath, filename)),
@@ -44,6 +44,6 @@ func (u *Uploader) Upload(filename string) error {
 	if err != nil {
 		return errors.Wrap(err, "S3 upload")
 	}
-	log.Infof("Successfully uploaded %s to %s\n", filename, result.Location)
+	log.Infof("Successfully uploaded %s to %s", filename, result.Location)
 	return nil
 }

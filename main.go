@@ -108,7 +108,7 @@ func main() {
 		if err == nil {
 			position <- string(msg.Value)
 		} else {
-			log.Errorf("Consumer error: %v (%v)\n", err, msg)
+			log.Errorf("Consumer error: %v (%v)", err, msg)
 			break
 		}
 	}

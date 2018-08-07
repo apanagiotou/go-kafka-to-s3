@@ -92,7 +92,7 @@ func (w *RotateWriter) Rotate() (string, error) {
 func Compress(filename string) (string, error) {
 
 	compressed := filename + ".gz"
-	log.Debugf("Compressing %s\n", filename)
+	log.Debugf("Compressing %s", filename)
 
 	// Open file on disk.
 	f, err := os.Open(filename)
@@ -119,6 +119,6 @@ func Compress(filename string) (string, error) {
 	os.Remove(filename)
 
 	// Done.
-	log.Infof("File %s compressed\n", filename)
+	log.Infof("File %s compressed", filename)
 	return compressed, nil
 }

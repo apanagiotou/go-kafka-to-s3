@@ -22,17 +22,33 @@ docker build -t go-kafka-to-s3 .
 The run the docker container. You need (at least) one kafka broker, an AWS key and secret and, an S3 bucket
 
 ```
-docker run --rm --name go-kafka-to-s3 -it --env BOOTSTRAP_SERVERS=ip:port --env KAFKA_TOPIC=topic --env S3_BUCKET=your-bucket-name --env S3_REGION=us-east-1 go-kafka-to-s3
+docker run --rm --name go-kafka-to-s3 -it \
+    -e BOOTSTRAP_SERVERS=ip:port \
+    -e KAFKA_TOPIC=topic \
+    -e S3_BUCKET=your-bucket-name \
+    -e S3_REGION=eu-west-1 \
+    -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+    -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+    go-kafka-to-s3
 ```
 
 There are a couple of configuration variables that you can also change. Here are the default values for them:   
 - KAFKA_CONSUMER_GROUP=go-kafka-to-s3   
+- S3_BUCKET_SUBPATH=your-bucket-folder
 - FILE_SIZE_THRESHOLD_MB=10   
 
 Example:
 
 ```
-docker run --rm --name go-kafka-to-s3 -it --env BOOTSTRAP_SERVERS=10.1.0.1:9092 --env KAFKA_TOPIC=bookings --env S3_BUCKET=apanagiotou-bookings --env S3_REGION=eu-west-1 go-kafka-to-s3
+docker run --rm --name go-kafka-to-s3 -it \
+    -e BOOTSTRAP_SERVERS=10.1.0.1:9092 \
+    -e KAFKA_TOPIC=bookings \
+    -e S3_BUCKET=apanagiotou-bookings \
+    -e S3_BUCKET_SUBPATH=test-folder \
+    -e S3_REGION=eu-west-1 \
+    -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+    -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+    go-kafka-to-s3
 ```
 
 ## Running the tests
