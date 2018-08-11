@@ -59,4 +59,4 @@ go test ./...
 
 ## Authors
 
-* **Alexandros Panagiotou** - *[https://apanagiotou.com](https://apanagiotou.com)* / Twitter: *[@alexapanagiotou](https://twitter.com/alexapanagiotou)*
+* **Alexandros Panagiotou** - *[apanagiotou.com](https://apanagiotou.com)* / Twitter: *[@alexapanagiotou](https://twitter.com/alexapanagiotou)*
